@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\Status;
 use Illuminate\Database\Eloquent\Model;
 
 class Barber extends Model
@@ -15,11 +16,13 @@ class Barber extends Model
         'experience_years',
         'specialties',
         'is_active',
+        'status',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
         'specialties' => 'array',
+        'status' => Status::class,
     ];
 
     public function appointments()

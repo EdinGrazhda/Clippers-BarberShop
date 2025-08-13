@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Appointment;
 use App\Models\Barber;
+use App\Enums\Status;
 use Illuminate\Http\Request;
 
 class AppointmentController extends Controller
@@ -44,8 +45,9 @@ class AppointmentController extends Controller
 
         $appointments = $query->latest()->paginate(10)->withQueryString();
         $barbers = Barber::where('is_active', true)->orderBy('name')->get();
+        $appointmentStatuses = Status::appointmentStatuses();
         
-        return view('Admin.appointment.index', compact('appointments', 'barbers'));
+        return view('Admin.appointment.index', compact('appointments', 'barbers', 'appointmentStatuses'));
     }
 
     /**
@@ -59,7 +61,7 @@ class AppointmentController extends Controller
             'customer_phone' => 'nullable|string|max:20',
             'appointment_time' => 'required|date|after:now',
             'notes' => 'nullable|string|max:1000',
-            'status' => 'required|in:pending,confirmed,completed,cancelled',
+            'status' => 'required|in:' . implode(',', array_map(fn($status) => $status->value, Status::appointmentStatuses())),
         ]);
 
         Appointment::create($validated);
@@ -88,7 +90,7 @@ class AppointmentController extends Controller
             'customer_phone' => 'nullable|string|max:20',
             'appointment_time' => 'required|date',
             'notes' => 'nullable|string|max:1000',
-            'status' => 'required|in:pending,confirmed,completed,cancelled',
+            'status' => 'required|in:' . implode(',', array_map(fn($status) => $status->value, Status::appointmentStatuses())),
         ]);
 
         $appointment->update($validated);

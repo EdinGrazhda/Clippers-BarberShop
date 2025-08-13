@@ -74,10 +74,11 @@
                                 x-model="filters.status" @change="updateTable()"
                                 class="w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
                             <option value="">All Status</option>
-                            <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
-                            <option value="confirmed" {{ request('status') == 'confirmed' ? 'selected' : '' }}>Confirmed</option>
-                            <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed</option>
-                            <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                            @foreach($appointmentStatuses as $status)
+                                <option value="{{ $status->value }}" {{ request('status') == $status->value ? 'selected' : '' }}>
+                                    {{ $status->label() }}
+                                </option>
+                            @endforeach
                         </select>
                     </div>
 
@@ -141,12 +142,8 @@
                                         <div class="text-sm text-gray-500 dark:text-gray-400">{{ $appointment->appointment_time->format('h:i A') }}</div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
-                                            @if($appointment->status === 'pending') bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300
-                                            @elseif($appointment->status === 'confirmed') bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300
-                                            @elseif($appointment->status === 'completed') bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300
-                                            @else bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 @endif">
-                                            {{ ucfirst($appointment->status) }}
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {{ $appointment->status->colorClass() }}">
+                                            {{ $appointment->status->label() }}
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
@@ -269,10 +266,9 @@
                             <div>
                                 <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status *</label>
                                 <select name="status" id="status" x-model="formData.status" required class="w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
-                                    <option value="pending">Pending</option>
-                                    <option value="confirmed">Confirmed</option>
-                                    <option value="completed">Completed</option>
-                                    <option value="cancelled">Cancelled</option>
+                                    @foreach($appointmentStatuses as $status)
+                                        <option value="{{ $status->value }}">{{ $status->label() }}</option>
+                                    @endforeach
                                 </select>
                             </div>
 
