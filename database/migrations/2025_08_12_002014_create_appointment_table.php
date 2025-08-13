@@ -13,6 +13,13 @@ return new class extends Migration
     {
         Schema::create('appointment', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('barber_id');
+            $table->dateTime('appointment_time');
+            $table->string('customer_name');
+            $table->string('customer_phone')->nullable();
+            $table->text('notes')->nullable();
+            $table->foreign('barber_id')->references('id')->on('barbers')->onDelete('cascade');
+            $table->enum('status', ['pending', 'confirmed', 'completed', 'cancelled'])->default('pending');
             $table->timestamps();
         });
     }
