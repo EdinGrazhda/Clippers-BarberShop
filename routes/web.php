@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\BarbersController;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
@@ -30,9 +32,12 @@ Route::post('/book', function (Request $request) {
     return back()->with('status', 'Thanks, ' . $validated['name'] . '. Your ' . $validated['service'] . ' on ' . $validated['date'] . ' at ' . $validated['time'] . ' has been requested. We\'ll confirm shortly.');
 })->name('book');
 
+// Barbers CRUD routes
 Route::middleware(['auth'])->group(function () {
+    Route::resource('barbers', BarbersController::class);
+    Route::resource('appointments', AppointmentController::class);
+    
     Route::redirect('settings', 'settings/profile');
-
     Route::get('settings/profile', Profile::class)->name('settings.profile');
     Route::get('settings/password', Password::class)->name('settings.password');
     Route::get('settings/appearance', Appearance::class)->name('settings.appearance');
