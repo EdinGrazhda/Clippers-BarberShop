@@ -52,6 +52,20 @@ class AppointmentController extends Controller
     }
 
     /**
+     * Show the form for creating a new resource.
+     */
+    public function create(Request $request)
+    {
+        $barbers = Barber::where('is_active', true)->orderBy('name')->get();
+        $appointmentStatuses = Status::appointmentStatuses();
+        
+        // Pre-fill datetime if provided from calendar
+        $datetime = $request->get('datetime');
+        
+        return view('Admin.appointment.create', compact('barbers', 'appointmentStatuses', 'datetime'));
+    }
+
+    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
@@ -61,6 +75,7 @@ class AppointmentController extends Controller
             'customer_name' => 'required|string|max:255',
             'customer_phone' => 'nullable|string|max:20',
             'customer_email' => 'nullable|email|max:255',
+            'service' => 'required|string|max:255',
             'appointment_time' => 'required|date|after:now',
             'notes' => 'nullable|string|max:1000',
             'status' => 'required|in:' . implode(',', array_map(fn($status) => $status->value, Status::appointmentStatuses())),
@@ -82,6 +97,17 @@ class AppointmentController extends Controller
     }
 
     /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Appointment $appointment)
+    {
+        $barbers = Barber::where('is_active', true)->orderBy('name')->get();
+        $appointmentStatuses = Status::appointmentStatuses();
+        
+        return view('Admin.appointment.edit', compact('appointment', 'barbers', 'appointmentStatuses'));
+    }
+
+    /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, Appointment $appointment)
@@ -91,6 +117,7 @@ class AppointmentController extends Controller
             'customer_name' => 'required|string|max:255',
             'customer_phone' => 'nullable|string|max:20',
             'customer_email' => 'nullable|email|max:255',
+            'service' => 'required|string|max:255',
             'appointment_time' => 'required|date',
             'notes' => 'nullable|string|max:1000',
             'status' => 'required|in:' . implode(',', array_map(fn($status) => $status->value, Status::appointmentStatuses())),
@@ -111,5 +138,24 @@ class AppointmentController extends Controller
 
         return redirect()->route('appointments.index')
             ->with('success', 'Appointment deleted successfully!');
+    }
+
+    /**
+     * Get appointments for calendar view
+     */
+    public function getCalendarAppointments(Request $request)
+    {
+        $start = $request->get('start');
+        $end = $request->get('end');
+        
+        $query = Appointment::with('barber');
+        
+        if ($start && $end) {
+            $query->whereBetween('appointment_time', [$start . ' 00:00:00', $end . ' 23:59:59']);
+        }
+        
+        $appointments = $query->orderBy('appointment_time')->get();
+        
+        return response()->json($appointments);
     }
 }
