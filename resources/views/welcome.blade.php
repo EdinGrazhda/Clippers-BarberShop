@@ -13,8 +13,122 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    
+    <!-- Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
 </head>
 <body class="bg-black text-white antialiased font-sans selection:bg-yellow-400 selection:text-black">
+    
+    <!-- Flash Messages -->
+    @if(session('success'))
+        <div x-data="{ show: true }" 
+             x-init="setTimeout(() => show = false, 5000)" 
+             x-show="show" 
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 transform -translate-y-2"
+             x-transition:enter-end="opacity-100 transform translate-y-0"
+             x-transition:leave="transition ease-in duration-300"
+             x-transition:leave-start="opacity-100 transform translate-y-0"
+             x-transition:leave-end="opacity-0 transform -translate-y-2"
+             class="fixed top-4 right-4 z-[60] w-full max-w-md">
+            <div class="bg-gradient-to-r from-green-500 to-emerald-600 border border-green-400/30 rounded-xl shadow-2xl backdrop-blur-sm">
+                <div class="p-6">
+                    <div class="flex items-start space-x-4">
+                        <div class="flex-shrink-0">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="text-white font-bold text-lg mb-1">🎉 Booking Confirmed!</h4>
+                            <p class="text-white/90 text-sm leading-relaxed">{{ session('success') }}</p>
+                        </div>
+                        <button @click="show = false" class="flex-shrink-0 text-white/60 hover:text-white transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div x-data="{ show: true }" 
+             x-init="setTimeout(() => show = false, 5000)" 
+             x-show="show" 
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 transform -translate-y-2"
+             x-transition:enter-end="opacity-100 transform translate-y-0"
+             x-transition:leave="transition ease-in duration-300"
+             x-transition:leave-start="opacity-100 transform translate-y-0"
+             x-transition:leave-end="opacity-0 transform -translate-y-2"
+             class="fixed top-4 right-4 z-[60] w-full max-w-md">
+            <div class="bg-gradient-to-r from-red-500 to-rose-600 border border-red-400/30 rounded-xl shadow-2xl backdrop-blur-sm">
+                <div class="p-6">
+                    <div class="flex items-start space-x-4">
+                        <div class="flex-shrink-0">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="text-white font-bold text-lg mb-1">❌ Booking Failed</h4>
+                            <p class="text-white/90 text-sm leading-relaxed">{{ session('error') }}</p>
+                        </div>
+                        <button @click="show = false" class="flex-shrink-0 text-white/60 hover:text-white transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    @if($errors->any())
+        <div x-data="{ show: true }" 
+             x-init="setTimeout(() => show = false, 6000)" 
+             x-show="show" 
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 transform -translate-y-2"
+             x-transition:enter-end="opacity-100 transform translate-y-0"
+             x-transition:leave="transition ease-in duration-300"
+             x-transition:leave-start="opacity-100 transform translate-y-0"
+             x-transition:leave-end="opacity-0 transform -translate-y-2"
+             class="fixed top-4 right-4 z-[60] w-full max-w-md">
+            <div class="bg-gradient-to-r from-orange-500 to-amber-600 border border-orange-400/30 rounded-xl shadow-2xl backdrop-blur-sm">
+                <div class="p-6">
+                    <div class="flex items-start space-x-4">
+                        <div class="flex-shrink-0">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.19 2.5 1.732 2.5z"></path>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="text-white font-bold text-lg mb-1">⚠️ Validation Errors</h4>
+                            <div class="text-white/90 text-sm space-y-1">
+                                @foreach($errors->all() as $error)
+                                    <p class="leading-relaxed">• {{ $error }}</p>
+                                @endforeach
+                            </div>
+                        </div>
+                        <button @click="show = false" class="flex-shrink-0 text-white/60 hover:text-white transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
     
     <!-- Header -->
     <header class="fixed top-0 inset-x-0 z-50 border-b border-white/10 bg-black/80 backdrop-blur-xl">
@@ -443,101 +557,345 @@
             </div>
         </section>
 
-        <!-- Booking Section -->
+        <!-- Appointment Section -->
         <section id="booking" class="py-20 sm:py-24 bg-zinc-950">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div class="max-w-4xl mx-auto">
-                    <div class="text-center mb-12">
-                        <h2 class="text-4xl sm:text-5xl font-serif font-bold text-white mb-4" data-animate>Book Your Appointment</h2>
-                        <p class="text-xl text-white/70" data-animate>Ready for your next cut? Schedule with us today.</p>
-                    </div>
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl sm:text-5xl font-serif font-bold text-white mb-4" data-animate>Meet Our Barbers</h2>
+                    <p class="text-xl text-white/70" data-animate>Choose your preferred barber and book your appointment.</p>
+                </div>
 
-                    <form method="POST" action="{{ route('book') }}" class="bg-white/5 p-8 rounded-2xl border border-white/10" data-animate>
-                        @csrf
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label for="name" class="block text-sm font-medium text-white/80 mb-2">Full Name *</label>
-                                <input type="text" id="name" name="name" required value="{{ old('name') }}"
-                                       class="w-full px-4 py-3 bg-black/40 border border-white/20 rounded-lg text-white placeholder-white/40 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 transition-colors">
-                            </div>
-
-                            <div>
-                                <label for="phone" class="block text-sm font-medium text-white/80 mb-2">Phone Number *</label>
-                                <input type="tel" id="phone" name="phone" required value="{{ old('phone') }}"
-                                       class="w-full px-4 py-3 bg-black/40 border border-white/20 rounded-lg text-white placeholder-white/40 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 transition-colors">
-                            </div>
-
-                            <div>
-                                <label for="email" class="block text-sm font-medium text-white/80 mb-2">Email</label>
-                                <input type="email" id="email" name="email" value="{{ old('email') }}"
-                                       class="w-full px-4 py-3 bg-black/40 border border-white/20 rounded-lg text-white placeholder-white/40 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 transition-colors">
-                            </div>
-
-                            <div>
-                                <label for="service" class="block text-sm font-medium text-white/80 mb-2">Service *</label>
-                                <select id="service" name="service" required
-                                        class="w-full px-4 py-3 bg-black/40 border border-white/20 rounded-lg text-white focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 transition-colors">
-                                    <option value="">Select a service</option>
-                                    <option value="Classic Haircut" {{ old('service') == 'Classic Haircut' ? 'selected' : '' }}>Classic Haircut - $35</option>
-                                    <option value="Skin Fade" {{ old('service') == 'Skin Fade' ? 'selected' : '' }}>Skin Fade - $45</option>
-                                    <option value="Beard Trim" {{ old('service') == 'Beard Trim' ? 'selected' : '' }}>Beard Trim - $25</option>
-                                    <option value="Hot Towel Shave" {{ old('service') == 'Hot Towel Shave' ? 'selected' : '' }}>Hot Towel Shave - $40</option>
-                                    <option value="The Full Experience" {{ old('service') == 'The Full Experience' ? 'selected' : '' }}>The Full Experience - $85</option>
-                                </select>
-                            </div>
-
-                            <div>
-                                <label for="date" class="block text-sm font-medium text-white/80 mb-2">Preferred Date *</label>
-                                <input type="date" id="date" name="date" required value="{{ old('date') }}"
-                                       class="w-full px-4 py-3 bg-black/40 border border-white/20 rounded-lg text-white focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 transition-colors">
-                            </div>
-
-                            <div>
-                                <label for="time" class="block text-sm font-medium text-white/80 mb-2">Preferred Time *</label>
-                                <select id="time" name="time" required
-                                        class="w-full px-4 py-3 bg-black/40 border border-white/20 rounded-lg text-white focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 transition-colors">
-                                    <option value="">Select a time</option>
-                                    <option value="09:00" {{ old('time') == '09:00' ? 'selected' : '' }}>9:00 AM</option>
-                                    <option value="10:00" {{ old('time') == '10:00' ? 'selected' : '' }}>10:00 AM</option>
-                                    <option value="11:00" {{ old('time') == '11:00' ? 'selected' : '' }}>11:00 AM</option>
-                                    <option value="12:00" {{ old('time') == '12:00' ? 'selected' : '' }}>12:00 PM</option>
-                                    <option value="13:00" {{ old('time') == '13:00' ? 'selected' : '' }}>1:00 PM</option>
-                                    <option value="14:00" {{ old('time') == '14:00' ? 'selected' : '' }}>2:00 PM</option>
-                                    <option value="15:00" {{ old('time') == '15:00' ? 'selected' : '' }}>3:00 PM</option>
-                                    <option value="16:00" {{ old('time') == '16:00' ? 'selected' : '' }}>4:00 PM</option>
-                                    <option value="17:00" {{ old('time') == '17:00' ? 'selected' : '' }}>5:00 PM</option>
-                                    <option value="18:00" {{ old('time') == '18:00' ? 'selected' : '' }}>6:00 PM</option>
-                                </select>
-                            </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    @foreach($barbers as $barber)
+                    <div class="bg-white/5 rounded-2xl border border-white/10 overflow-hidden group hover:bg-white/10 transition-all duration-300" data-animate>
+                        <div class="aspect-w-4 aspect-h-3 relative">
+                            @if($barber->image)
+                                <img src="{{ Storage::url($barber->image) }}" 
+                                     alt="{{ $barber->name }}" 
+                                     class="w-full h-64 object-cover">
+                            @else
+                                <div class="w-full h-64 bg-gradient-to-br from-yellow-400/20 to-yellow-600/20 flex items-center justify-center">
+                                    <div class="w-24 h-24 bg-yellow-400 rounded-full flex items-center justify-center text-black text-2xl font-bold">
+                                        {{ substr($barber->name, 0, 1) }}
+                                    </div>
+                                </div>
+                            @endif
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
                         </div>
-
-                        <div class="mt-6">
-                            <label for="notes" class="block text-sm font-medium text-white/80 mb-2">Special Requests</label>
-                            <textarea id="notes" name="notes" rows="4"
-                                      class="w-full px-4 py-3 bg-black/40 border border-white/20 rounded-lg text-white placeholder-white/40 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 transition-colors"
-                                      placeholder="Any specific requests or preferences?">{{ old('notes') }}</textarea>
-                        </div>
-
-                        @if ($errors->any())
-                            <div class="mt-6 p-4 bg-red-500/20 border border-red-500/30 rounded-lg">
-                                <ul class="text-red-300 text-sm space-y-1">
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        @endif
-
-                        <div class="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-                            <p class="text-sm text-white/60">We'll confirm your appointment within 24 hours</p>
-                            <button type="submit" class="bg-yellow-400 text-black px-8 py-3 rounded-full font-semibold hover:bg-yellow-300 transition-all transform hover:scale-105">
-                                Book Appointment
+                        
+                        <div class="p-6">
+                            <h3 class="text-2xl font-semibold text-white mb-2">{{ $barber->name }}</h3>
+                            
+                            @if($barber->experience_years)
+                                <p class="text-yellow-400 mb-2">{{ $barber->experience_years }} years experience</p>
+                            @endif
+                            
+                            @if($barber->description)
+                                <p class="text-white/70 mb-4 line-clamp-3">{{ $barber->description }}</p>
+                            @endif
+                            
+                            @if($barber->specialties && count($barber->specialties) > 0)
+                                <div class="mb-4">
+                                    <div class="flex flex-wrap gap-2">
+                                        @foreach(array_slice($barber->specialties, 0, 3) as $specialty)
+                                            <span class="px-2 py-1 text-xs bg-yellow-400/20 text-yellow-400 rounded-full">
+                                                {{ $specialty }}
+                                            </span>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
+                            
+                            <button onclick="document.dispatchEvent(new CustomEvent('open-booking-modal', { detail: { barberId: {{ $barber->id }}, barberName: '{{ $barber->name }}' } }))"
+                                    class="w-full bg-yellow-400 text-black px-6 py-3 rounded-lg font-semibold hover:bg-yellow-300 transition-colors">
+                                Book with {{ $barber->name }}
                             </button>
                         </div>
-                    </form>
+                    </div>
+                    @endforeach
                 </div>
             </div>
         </section>
+
+        <!-- Booking Modal -->
+        <div x-data="bookingModal()" 
+             x-show="isOpen" 
+             x-cloak 
+             class="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm" 
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0">
+            <div class="flex min-h-full items-center justify-center p-4" @click.self="closeModal()">
+                <div class="bg-zinc-900 rounded-2xl border border-white/20 p-8 w-full max-w-4xl"
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0 scale-95"
+                     x-transition:enter-end="opacity-100 scale-100"
+                     x-transition:leave="transition ease-in duration-200"
+                     x-transition:leave-start="opacity-100 scale-100"
+                     x-transition:leave-end="opacity-0 scale-95">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h3 x-text="modalTitle" class="text-2xl font-bold text-white">Book Appointment</h3>
+                            <div class="flex items-center mt-2 space-x-4">
+                                <div class="flex items-center">
+                                    <div :class="currentStep === 1 ? 'bg-yellow-400 text-black' : (currentStep > 1 ? 'bg-green-500 text-white' : 'bg-white/20 text-white/60')" 
+                                         class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold">
+                                        <span x-show="currentStep === 1">1</span>
+                                        <span x-show="currentStep > 1">✓</span>
+                                    </div>
+                                    <span :class="currentStep === 1 ? 'text-white' : 'text-white/60'" class="ml-2">Client Info & Services</span>
+                                </div>
+                                <div class="w-8 h-0.5 bg-white/20"></div>
+                                <div class="flex items-center">
+                                    <div :class="currentStep === 2 ? 'bg-yellow-400 text-black' : (currentStep > 2 ? 'bg-green-500 text-white' : 'bg-white/20 text-white/60')" 
+                                         class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold">
+                                        <span x-show="currentStep === 2">2</span>
+                                        <span x-show="currentStep > 2">✓</span>
+                                        <span x-show="currentStep < 2">2</span>
+                                    </div>
+                                    <span :class="currentStep === 2 ? 'text-white' : 'text-white/60'" class="ml-2">Date & Time</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button @click="closeModal()" class="text-white/60 hover:text-white text-2xl">×</button>
+                    </div>
+
+                    @if(session('success'))
+                        <div x-data="{ show: true }" 
+                             x-init="setTimeout(() => show = false, 4000)" 
+                             x-show="show" 
+                             x-transition:enter="transition ease-out duration-300"
+                             x-transition:enter-start="opacity-0 scale-95"
+                             x-transition:enter-end="opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-300"
+                             x-transition:leave-start="opacity-100 scale-100"
+                             x-transition:leave-end="opacity-0 scale-95"
+                             class="mb-6 p-6 bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30 rounded-xl shadow-lg">
+                            <div class="flex items-start space-x-3">
+                                <div class="flex-shrink-0">
+                                    <svg class="w-6 h-6 text-green-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="text-green-300 font-semibold mb-1 text-lg">🎉 Booking Confirmed!</h4>
+                                    <p class="text-green-300 text-sm leading-relaxed">{{ session('success') }}</p>
+                                </div>
+                                <button @click="show = false" class="flex-shrink-0 text-green-300/60 hover:text-green-300 transition-colors">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    @endif
+
+                    @if($errors->any())
+                        <div x-data="{ show: true }" 
+                             x-init="setTimeout(() => show = false, 6000)" 
+                             x-show="show" 
+                             x-transition:enter="transition ease-out duration-300"
+                             x-transition:enter-start="opacity-0 scale-95"
+                             x-transition:enter-end="opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-300"
+                             x-transition:leave-start="opacity-100 scale-100"
+                             x-transition:leave-end="opacity-0 scale-95"
+                             class="mb-6 p-6 bg-gradient-to-r from-red-500/20 to-rose-500/20 border border-red-500/30 rounded-xl shadow-lg">
+                            <div class="flex items-start space-x-3">
+                                <div class="flex-shrink-0">
+                                    <svg class="w-6 h-6 text-red-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.19 2.5 1.732 2.5z"></path>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="text-red-300 font-semibold mb-2 text-lg">⚠️ Please Fix These Issues:</h4>
+                                    <div class="text-red-300 text-sm space-y-1">
+                                        @foreach($errors->all() as $error)
+                                            <p class="leading-relaxed">• {{ $error }}</p>
+                                        @endforeach
+                                    </div>
+                                </div>
+                                <button @click="show = false" class="flex-shrink-0 text-red-300/60 hover:text-red-300 transition-colors">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    @endif
+
+                    <form method="POST" action="{{ route('book') }}" @submit.prevent="handleSubmit">
+                        @csrf
+                        <input type="hidden" name="barber_id" x-model="selectedBarberId">
+                        <input type="hidden" name="appointment_time" x-model="selectedTimeSlot">
+
+                        <!-- Step 1: Client Information & Services -->
+                        <div x-show="currentStep === 1" 
+                             x-transition:enter="transition ease-out duration-300"
+                             x-transition:enter-start="opacity-0 transform translate-x-4"
+                             x-transition:enter-end="opacity-100 transform translate-x-0"
+                             x-transition:leave="transition ease-in duration-200"
+                             x-transition:leave-start="opacity-100 transform translate-x-0"
+                             x-transition:leave-end="opacity-0 transform -translate-x-4"
+                             class="space-y-6">
+                            
+                            <!-- Client Information -->
+                            <div>
+                                <h4 class="text-lg font-semibold text-white mb-4">Client Information</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="customer_name" class="block text-sm font-medium text-white/80 mb-2">Full Name *</label>
+                                        <input type="text" id="customer_name" name="customer_name" required x-model="customerName"
+                                               class="w-full px-4 py-3 bg-black/40 border border-white/20 rounded-lg text-white placeholder-white/40 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 transition-colors">
+                                    </div>
+
+                                    <div>
+                                        <label for="customer_phone" class="block text-sm font-medium text-white/80 mb-2">Phone Number *</label>
+                                        <input type="tel" id="customer_phone" name="customer_phone" required x-model="customerPhone"
+                                               class="w-full px-4 py-3 bg-black/40 border border-white/20 rounded-lg text-white placeholder-white/40 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 transition-colors">
+                                    </div>
+
+                                    <div class="md:col-span-2">
+                                        <label for="customer_email" class="block text-sm font-medium text-white/80 mb-2">Email Address *</label>
+                                        <input type="email" id="customer_email" name="customer_email" required x-model="customerEmail"
+                                               class="w-full px-4 py-3 bg-black/40 border border-white/20 rounded-lg text-white placeholder-white/40 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 transition-colors">
+                                        <p class="text-sm text-white/60 mt-1">We'll send a verification code to this email</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Services Selection -->
+                            <div>
+                                <h4 class="text-lg font-semibold text-white mb-4">Select Services *</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    @php
+                                        $services = [
+                                            ['name' => 'Basic Haircut', 'price' => 25],
+                                            ['name' => 'Beard Trim', 'price' => 15],
+                                            ['name' => 'Hair Wash & Style', 'price' => 20],
+                                            ['name' => 'Premium Cut & Styling', 'price' => 45],
+                                            ['name' => 'Hot Towel Shave', 'price' => 30],
+                                            ['name' => 'Full Grooming Package', 'price' => 65]
+                                        ]
+                                    @endphp
+                                    
+                                    @foreach($services as $service)
+                                        <label class="flex items-center p-4 bg-black/40 border border-white/20 rounded-lg hover:bg-black/60 transition-colors cursor-pointer">
+                                            <input type="checkbox" name="services[]" value="{{ $service['name'] }}" 
+                                                   x-model="selectedServices"
+                                                   @change="updateTotalPrice()"
+                                                   class="w-5 h-5 text-yellow-400 bg-transparent border-white/20 rounded focus:ring-yellow-400 focus:ring-2">
+                                            <div class="ml-3 flex-1">
+                                                <div class="text-white font-medium">{{ $service['name'] }}</div>
+                                                <div class="text-yellow-400 text-sm">${{ $service['price'] }}</div>
+                                            </div>
+                                        </label>
+                                    @endforeach
+                                </div>
+                                <div x-show="showServiceError" class="text-red-400 text-sm mt-2">Please select at least one service.</div>
+                            </div>
+
+                            <!-- Total Price -->
+                            <div class="bg-black/40 rounded-lg p-4 border border-white/20">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-lg font-semibold text-white">Total Price:</span>
+                                    <span class="text-xl font-bold text-yellow-400" x-text="'$' + totalPrice">$0</span>
+                                </div>
+                            </div>
+
+                            <!-- Step 1 Actions -->
+                            <div class="flex justify-between items-center pt-4">
+                                <button type="button" @click="closeModal()" 
+                                        class="px-6 py-3 border border-white/20 text-white rounded-lg hover:bg-white/10 transition-colors">
+                                    Cancel
+                                </button>
+                                <button type="button" @click="goToStep2()" 
+                                        class="px-8 py-3 bg-yellow-400 text-black rounded-lg font-semibold hover:bg-yellow-300 transition-colors">
+                                    Next: Choose Date & Time
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Date & Time Selection -->
+                        <div x-show="currentStep === 2" 
+                             x-transition:enter="transition ease-out duration-300"
+                             x-transition:enter-start="opacity-0 transform translate-x-4"
+                             x-transition:enter-end="opacity-100 transform translate-x-0"
+                             x-transition:leave="transition ease-in duration-200"
+                             x-transition:leave-start="opacity-100 transform translate-x-0"
+                             x-transition:leave-end="opacity-0 transform -translate-x-4"
+                             class="space-y-6">
+                            
+                            <!-- Date Selection -->
+                            <div>
+                                <h4 class="text-lg font-semibold text-white mb-4">Select Date</h4>
+                                <input type="date" id="appointment_date" name="appointment_date" required 
+                                       x-model="appointmentDate"
+                                       @change="loadAvailableSlots()"
+                                       :min="minDate"
+                                       class="w-full px-4 py-3 bg-black/40 border border-white/20 rounded-lg text-white focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 transition-colors">
+                            </div>
+
+                            <!-- Time Selection -->
+                            <div>
+                                <h4 class="text-lg font-semibold text-white mb-4">Available Time Slots</h4>
+                                <div x-show="loadingSlots" class="text-center py-8 text-white/60">
+                                    Loading available slots...
+                                </div>
+                                <div x-show="!loadingSlots && availableSlots.length === 0 && appointmentDate" class="text-center py-8 text-red-400">
+                                    No available slots for this date
+                                </div>
+                                <div x-show="!loadingSlots && !appointmentDate" class="text-center py-8 text-white/60">
+                                    Please select a date first
+                                </div>
+                                <div x-show="!loadingSlots && availableSlots.length > 0" class="grid grid-cols-3 md:grid-cols-4 gap-3">
+                                    <template x-for="slot in availableSlots" :key="slot">
+                                        <button type="button" 
+                                                @click="selectTimeSlot(slot)"
+                                                :class="selectedTimeSlot === slot ? 'bg-yellow-400 text-black' : 'bg-black/40 border-white/20 text-white hover:bg-white/10'"
+                                                class="px-4 py-3 border rounded-lg transition-colors text-sm font-medium"
+                                                x-text="formatTime(slot)">
+                                        </button>
+                                    </template>
+                                </div>
+                                <div x-show="showTimeSlotError" class="text-red-400 text-sm mt-2">Please select a time slot.</div>
+                            </div>
+
+                            <!-- Step 2 Actions -->
+                            <div class="flex justify-between items-center pt-4">
+                                <button type="button" @click="goToStep1()" 
+                                        class="px-6 py-3 border border-white/20 text-white rounded-lg hover:bg-white/10 transition-colors">
+                                    Back
+                                </button>
+                                <div class="flex gap-4">
+                                    <button type="button" @click="closeModal()" 
+                                            class="px-6 py-3 border border-white/20 text-white rounded-lg hover:bg-white/10 transition-colors">
+                                        Cancel
+                                    </button>
+                                    <button type="button" @click="submitBooking()"
+                                            :disabled="!appointmentDate || !selectedTimeSlot || submitting"
+                                            class="px-8 py-3 bg-yellow-400 text-black rounded-lg font-semibold hover:bg-yellow-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                                        <span x-show="!submitting">Confirm Appointment</span>
+                                        <span x-show="submitting" class="flex items-center">
+                                            <svg class="animate-spin -ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
+                                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                            </svg>
+                                            Booking...
+                                        </span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </form>
+                </div>
+            </div>
+        </div>
 
         <!-- Location Section -->
         <section id="location" class="py-20 sm:py-24 bg-black">
@@ -667,8 +1025,264 @@
     </footer>
 
     <script>
-        // Set minimum date to today
-        document.getElementById('date').min = new Date().toISOString().split('T')[0];
+        // Alpine.js booking modal component
+        function bookingModal() {
+            return {
+                isOpen: false,
+                currentStep: 1,
+                selectedBarberId: null,
+                selectedBarberName: '',
+                // Step 1: Client Information
+                customerName: '',
+                customerPhone: '',
+                customerEmail: '',
+                selectedServices: [],
+                totalPrice: 0,
+                // Step 2: Date & Time
+                appointmentDate: '',
+                selectedTimeSlot: '',
+                availableSlots: [],
+                loadingSlots: false,
+                showServiceError: false,
+                showTimeSlotError: false,
+                submitting: false,
+                minDate: new Date().toISOString().split('T')[0],
+                
+                services: {
+                    'Basic Haircut': 25,
+                    'Beard Trim': 15,
+                    'Hair Wash & Style': 20,
+                    'Premium Cut & Styling': 45,
+                    'Hot Towel Shave': 30,
+                    'Full Grooming Package': 65
+                },
+
+                get modalTitle() {
+                    const steps = ['Client Info & Services', 'Date & Time'];
+                    const stepTitle = steps[this.currentStep - 1] || 'Book Appointment';
+                    return this.selectedBarberName ? `${stepTitle} - ${this.selectedBarberName}` : stepTitle;
+                },
+
+                init() {
+                    // Ensure modal starts closed
+                    this.isOpen = false;
+                    this.currentStep = 1;
+                    
+                    this.$watch('isOpen', (value) => {
+                        if (value) {
+                            document.body.style.overflow = 'hidden';
+                        } else {
+                            document.body.style.overflow = '';
+                        }
+                    });
+
+                    // Listen for barber selection event from the entire document
+                    document.addEventListener('open-booking-modal', (event) => {
+                        this.openModal(event.detail.barberId, event.detail.barberName);
+                    });
+                },
+
+                openModal(barberId, barberName) {
+                    this.selectedBarberId = barberId;
+                    this.selectedBarberName = barberName;
+                    this.isOpen = true;
+                    this.resetForm();
+                },
+
+                closeModal() {
+                    this.isOpen = false;
+                    this.currentStep = 1;
+                    this.resetForm();
+                },
+
+                resetForm() {
+                    // Step 1: Client Information
+                    this.customerName = '';
+                    this.customerPhone = '';
+                    this.customerEmail = '';
+                    this.selectedServices = [];
+                    this.totalPrice = 0;
+                    // Step 2: Date & Time
+                    this.appointmentDate = '';
+                    this.selectedTimeSlot = '';
+                    this.availableSlots = [];
+                    this.showServiceError = false;
+                    this.showTimeSlotError = false;
+                    this.submitting = false;
+                },
+
+                submitBooking() {
+                    // Validate final step
+                    if (!this.appointmentDate || !this.selectedTimeSlot) {
+                        this.showTimeSlotError = true;
+                        return;
+                    }
+                    
+                    this.showTimeSlotError = false;
+                    this.submitting = true;
+
+                    // Create and submit form programmatically
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/book';
+
+                    // Add CSRF token
+                    const csrfInput = document.createElement('input');
+                    csrfInput.type = 'hidden';
+                    csrfInput.name = '_token';
+                    csrfInput.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                    form.appendChild(csrfInput);
+
+                    // Add form data
+                    const formData = {
+                        barber_id: this.selectedBarberId,
+                        customer_name: this.customerName,
+                        customer_phone: this.customerPhone,
+                        customer_email: this.customerEmail,
+                        appointment_date: this.appointmentDate,
+                        appointment_time: this.selectedTimeSlot,
+                        services: this.selectedServices
+                    };
+
+                    Object.entries(formData).forEach(([key, value]) => {
+                        if (key === 'services') {
+                            // Handle services array by creating multiple inputs
+                            value.forEach(service => {
+                                const input = document.createElement('input');
+                                input.type = 'hidden';
+                                input.name = 'services[]';
+                                input.value = service;
+                                form.appendChild(input);
+                            });
+                        } else {
+                            const input = document.createElement('input');
+                            input.type = 'hidden';
+                            input.name = key;
+                            input.value = value;
+                            form.appendChild(input);
+                        }
+                    });
+
+                    document.body.appendChild(form);
+                    form.submit();
+                },
+
+                updateTotalPrice() {
+                    this.totalPrice = this.selectedServices.reduce((total, service) => {
+                        return total + (this.services[service] || 0);
+                    }, 0);
+                },
+
+                goToStep2() {
+                    // Validate step 1
+                    if (!this.customerName.trim() || !this.customerPhone.trim() || !this.customerEmail.trim() || this.selectedServices.length === 0) {
+                        if (this.selectedServices.length === 0) {
+                            this.showServiceError = true;
+                        }
+                        return;
+                    }
+                    
+                    this.showServiceError = false;
+                    this.currentStep = 2;
+                },
+
+                goToStep1() {
+                    this.currentStep = 1;
+                },
+
+                async loadAvailableSlots() {
+                    if (!this.appointmentDate) return;
+                    
+                    this.loadingSlots = true;
+                    this.availableSlots = [];
+                    this.selectedTimeSlot = '';
+                    
+                    try {
+                        const response = await fetch(`/available-slots?date=${this.appointmentDate}&barber_id=${this.selectedBarberId}`);
+                        const data = await response.json();
+                        this.availableSlots = data.available_slots || [];
+                    } catch (error) {
+                        console.error('Error loading slots:', error);
+                        this.availableSlots = [];
+                    }
+                    
+                    this.loadingSlots = false;
+                },
+
+                selectTimeSlot(slot) {
+                    this.selectedTimeSlot = slot;
+                    this.showTimeSlotError = false;
+                },
+
+                formatTime(timeSlot) {
+                    if (!timeSlot) return '';
+                    const [hours, minutes] = timeSlot.split(':');
+                    const hour = parseInt(hours);
+                    const ampm = hour >= 12 ? 'PM' : 'AM';
+                    const displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
+                    return `${displayHour}:${minutes} ${ampm}`;
+                },
+
+                formatDate(dateString) {
+                    if (!dateString) return '';
+                    const date = new Date(dateString);
+                    return date.toLocaleDateString('en-US', { 
+                        weekday: 'long', 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                    });
+                },
+
+                handleSubmit(event) {
+                    // Prevent default form submission since we handle it with JavaScript
+                    event.preventDefault();
+                    return false;
+                }
+            }
+        }
+
+        // Page animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Initialize animations
+        document.addEventListener('DOMContentLoaded', () => {
+            const animatedElements = document.querySelectorAll('[data-animate]');
+            animatedElements.forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(30px)';
+                el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(el);
+            });
+
+            // Smooth scroll for navigation links
+            const navLinks = document.querySelectorAll('a[href^="#"]');
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('href').substring(1);
+                    const targetElement = document.getElementById(targetId);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        });
     </script>
 </body>
 </html>

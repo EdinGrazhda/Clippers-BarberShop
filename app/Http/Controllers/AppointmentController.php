@@ -22,6 +22,7 @@ class AppointmentController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('customer_name', 'like', "%{$search}%")
                   ->orWhere('customer_phone', 'like', "%{$search}%")
+                  ->orWhere('customer_email', 'like', "%{$search}%")
                   ->orWhereHas('barber', function ($barberQuery) use ($search) {
                       $barberQuery->where('name', 'like', "%{$search}%");
                   });
@@ -59,6 +60,7 @@ class AppointmentController extends Controller
             'barber_id' => 'required|exists:barbers,id',
             'customer_name' => 'required|string|max:255',
             'customer_phone' => 'nullable|string|max:20',
+            'customer_email' => 'nullable|email|max:255',
             'appointment_time' => 'required|date|after:now',
             'notes' => 'nullable|string|max:1000',
             'status' => 'required|in:' . implode(',', array_map(fn($status) => $status->value, Status::appointmentStatuses())),
@@ -88,6 +90,7 @@ class AppointmentController extends Controller
             'barber_id' => 'required|exists:barbers,id',
             'customer_name' => 'required|string|max:255',
             'customer_phone' => 'nullable|string|max:20',
+            'customer_email' => 'nullable|email|max:255',
             'appointment_time' => 'required|date',
             'notes' => 'nullable|string|max:1000',
             'status' => 'required|in:' . implode(',', array_map(fn($status) => $status->value, Status::appointmentStatuses())),
