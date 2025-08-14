@@ -6,7 +6,9 @@ use Illuminate\Http\Request;
 use App\Models\Appointment;
 use App\Models\Barber;
 use App\Enums\Status;
+use App\Services\VerificationService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class PublicBookingController extends Controller
 {
@@ -33,7 +35,14 @@ class PublicBookingController extends Controller
             'appointment_time' => 'required|string',
             'services' => 'required|array|min:1',
             'services.*' => 'string',
+            'verification_code' => 'required|string|size:4',
         ]);
+
+        // Verify the verification code
+        $verificationService = new VerificationService();
+        if (!$verificationService->verifyCode($request->customer_email, $request->verification_code)) {
+            return back()->withErrors(['verification_code' => 'Invalid or expired verification code.'])->withInput();
+        }
 
         // Check if the time slot is already taken
         $existingAppointment = Appointment::where('barber_id', $request->barber_id)
@@ -61,6 +70,57 @@ class PublicBookingController extends Controller
         }
 
         return back()->with('success', 'Your appointment has been confirmed successfully!');
+    }
+
+    /**
+     * Send verification code to customer email
+     */
+    public function sendVerification(Request $request)
+    {
+        Log::info('Send verification request received', $request->all());
+        
+        $request->validate([
+            'customer_email' => 'required|email|max:255',
+            'customer_name' => 'required|string|max:255',
+        ]);
+
+        try {
+            $verificationService = new VerificationService();
+            $code = $verificationService->sendVerificationCode($request->customer_email, $request->customer_name);
+            
+            Log::info('Verification code generated', ['email' => $request->customer_email, 'code' => $code]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Verification code sent to your email successfully!',
+                'debug_code' => $code // Remove this in production
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to send verification code', ['error' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 422);
+        }
+    }
+
+    /**
+     * Verify the provided code
+     */
+    public function verifyCode(Request $request)
+    {
+        $request->validate([
+            'customer_email' => 'required|email',
+            'verification_code' => 'required|string|size:4',
+        ]);
+
+        $verificationService = new VerificationService();
+        $isValid = $verificationService->verifyCode($request->customer_email, $request->verification_code);
+
+        return response()->json([
+            'success' => $isValid,
+            'message' => $isValid ? 'Verification successful!' : 'Invalid or expired verification code.'
+        ]);
     }
 
     /**

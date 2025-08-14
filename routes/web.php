@@ -19,6 +19,8 @@ Route::get('/', [PublicBookingController::class, 'index'])->name('home');
 // Booking routes
 Route::post('/book', [PublicBookingController::class, 'store'])->name('book');
 Route::get('/available-slots', [PublicBookingController::class, 'getAvailableSlots'])->name('available-slots');
+Route::post('/send-verification', [PublicBookingController::class, 'sendVerification'])->name('send-verification');
+Route::post('/verify-code', [PublicBookingController::class, 'verifyCode'])->name('verify-code');
 
 // Admin routes
 Route::middleware(['auth'])->group(function () {

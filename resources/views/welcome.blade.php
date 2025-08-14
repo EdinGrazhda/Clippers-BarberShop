@@ -639,16 +639,16 @@
                     <div class="flex justify-between items-center mb-6">
                         <div>
                             <h3 x-text="modalTitle" class="text-2xl font-bold text-white">Book Appointment</h3>
-                            <div class="flex items-center mt-2 space-x-4">
+                            <div class="flex items-center mt-2 space-x-2">
                                 <div class="flex items-center">
                                     <div :class="currentStep === 1 ? 'bg-yellow-400 text-black' : (currentStep > 1 ? 'bg-green-500 text-white' : 'bg-white/20 text-white/60')" 
                                          class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold">
                                         <span x-show="currentStep === 1">1</span>
                                         <span x-show="currentStep > 1">✓</span>
                                     </div>
-                                    <span :class="currentStep === 1 ? 'text-white' : 'text-white/60'" class="ml-2">Client Info & Services</span>
+                                    <span :class="currentStep === 1 ? 'text-white' : 'text-white/60'" class="ml-2 text-sm">Client Info</span>
                                 </div>
-                                <div class="w-8 h-0.5 bg-white/20"></div>
+                                <div class="w-6 h-0.5 bg-white/20"></div>
                                 <div class="flex items-center">
                                     <div :class="currentStep === 2 ? 'bg-yellow-400 text-black' : (currentStep > 2 ? 'bg-green-500 text-white' : 'bg-white/20 text-white/60')" 
                                          class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold">
@@ -656,7 +656,17 @@
                                         <span x-show="currentStep > 2">✓</span>
                                         <span x-show="currentStep < 2">2</span>
                                     </div>
-                                    <span :class="currentStep === 2 ? 'text-white' : 'text-white/60'" class="ml-2">Date & Time</span>
+                                    <span :class="currentStep === 2 ? 'text-white' : 'text-white/60'" class="ml-2 text-sm">Date & Time</span>
+                                </div>
+                                <div class="w-6 h-0.5 bg-white/20"></div>
+                                <div class="flex items-center">
+                                    <div :class="currentStep === 3 ? 'bg-yellow-400 text-black' : (currentStep > 3 ? 'bg-green-500 text-white' : 'bg-white/20 text-white/60')" 
+                                         class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold">
+                                        <span x-show="currentStep === 3">3</span>
+                                        <span x-show="currentStep > 3">✓</span>
+                                        <span x-show="currentStep < 3">3</span>
+                                    </div>
+                                    <span :class="currentStep === 3 ? 'text-white' : 'text-white/60'" class="ml-2 text-sm">Verification</span>
                                 </div>
                             </div>
                         </div>
@@ -730,7 +740,9 @@
                     <form method="POST" action="{{ route('book') }}" @submit.prevent="handleSubmit">
                         @csrf
                         <input type="hidden" name="barber_id" x-model="selectedBarberId">
+                        <input type="hidden" name="appointment_date" x-model="appointmentDate">
                         <input type="hidden" name="appointment_time" x-model="selectedTimeSlot">
+                        <input type="hidden" name="verification_code" x-model="verificationCode">
 
                         <!-- Step 1: Client Information & Services -->
                         <div x-show="currentStep === 1" 
@@ -875,16 +887,109 @@
                                             class="px-6 py-3 border border-white/20 text-white rounded-lg hover:bg-white/10 transition-colors">
                                         Cancel
                                     </button>
-                                    <button type="button" @click="submitBooking()"
-                                            :disabled="!appointmentDate || !selectedTimeSlot || submitting"
+                                    <button type="button" @click="goToStep3()"
+                                            :disabled="!appointmentDate || !selectedTimeSlot"
                                             class="px-8 py-3 bg-yellow-400 text-black rounded-lg font-semibold hover:bg-yellow-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                                        <span x-show="!submitting">Confirm Appointment</span>
+                                        Next: Verify Email
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Email Verification -->
+                        <div x-show="currentStep === 3" 
+                             x-transition:enter="transition ease-out duration-300"
+                             x-transition:enter-start="opacity-0 transform translate-x-4"
+                             x-transition:enter-end="opacity-100 transform translate-x-0"
+                             x-transition:leave="transition ease-in duration-200"
+                             x-transition:leave-start="opacity-100 transform translate-x-0"
+                             x-transition:leave-end="opacity-0 transform -translate-x-4"
+                             class="space-y-6">
+                            
+                            <!-- Email Verification -->
+                            <div>
+                                <h4 class="text-lg font-semibold text-white mb-4">📧 Email Verification</h4>
+                                <div class="bg-black/40 rounded-lg p-6 border border-white/20">
+                                    <div x-show="!verificationSent">
+                                        <p class="text-white/80 mb-4">
+                                            We'll send a 4-digit verification code to <strong x-text="customerEmail" class="text-yellow-400"></strong> to confirm your appointment.
+                                        </p>
+                                        <button type="button" @click="sendVerificationCode()" 
+                                                :disabled="sendingCode"
+                                                class="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                                            <span x-show="!sendingCode">📧 Send Verification Code</span>
+                                            <span x-show="sendingCode" class="flex items-center justify-center">
+                                                <svg class="animate-spin -ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
+                                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                </svg>
+                                                Sending Code...
+                                            </span>
+                                        </button>
+                                    </div>
+
+                                    <div x-show="verificationSent">
+                                        <div class="text-center mb-6">
+                                            <div class="text-green-400 text-lg font-semibold mb-2">✅ Code Sent!</div>
+                                            <p class="text-white/80">
+                                                A 4-digit verification code has been sent to <strong x-text="customerEmail" class="text-yellow-400"></strong>
+                                            </p>
+                                            <p class="text-white/60 text-sm mt-2">Please check your email and enter the code below.</p>
+                                        </div>
+
+                                        <div class="space-y-4">
+                                            <div>
+                                                <label for="verification_code" class="block text-sm font-medium text-white/80 mb-2">Verification Code *</label>
+                                                <input type="text" 
+                                                       name="verification_code"
+                                                       x-model="verificationCode"
+                                                       @input="verificationCode = verificationCode.replace(/[^0-9]/g, '').slice(0, 4); showVerificationError = false;"
+                                                       placeholder="Enter 4-digit code"
+                                                       maxlength="4"
+                                                       class="w-full px-4 py-3 bg-black/40 border border-white/20 rounded-lg text-white text-center text-2xl font-bold letter-spacing-4 placeholder-white/40 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 transition-colors"
+                                                       :class="showVerificationError ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-white/20 focus:border-yellow-400 focus:ring-yellow-400'">
+                                            </div>
+                                            
+                                            <div x-show="showVerificationError" class="text-red-400 text-sm">
+                                                <span x-show="!verificationCode">Please enter the verification code.</span>
+                                                <span x-show="verificationCode && verificationCode.length !== 4">Verification code must be 4 digits.</span>
+                                            </div>
+                                            
+                                            <div class="flex justify-between items-center text-sm">
+                                                <button type="button" @click="sendVerificationCode()" 
+                                                        :disabled="sendingCode"
+                                                        class="text-blue-400 hover:text-blue-300 transition-colors disabled:opacity-50">
+                                                    <span x-show="!sendingCode">📧 Resend Code</span>
+                                                    <span x-show="sendingCode">Sending...</span>
+                                                </button>
+                                                <span class="text-white/60">Code expires in 10 minutes</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Step 3 Actions -->
+                            <div class="flex justify-between items-center pt-4">
+                                <button type="button" @click="goToStep2()" 
+                                        class="px-6 py-3 border border-white/20 text-white rounded-lg hover:bg-white/10 transition-colors">
+                                    Back
+                                </button>
+                                <div class="flex gap-4">
+                                    <button type="button" @click="closeModal()" 
+                                            class="px-6 py-3 border border-white/20 text-white rounded-lg hover:bg-white/10 transition-colors">
+                                        Cancel
+                                    </button>
+                                    <button type="button" @click="submitBooking()"
+                                            :disabled="!verificationSent || verificationCode.length !== 4 || submitting"
+                                            class="px-8 py-3 bg-yellow-400 text-black rounded-lg font-semibold hover:bg-yellow-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                                        <span x-show="!submitting">✅ Confirm Appointment</span>
                                         <span x-show="submitting" class="flex items-center">
                                             <svg class="animate-spin -ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
                                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                             </svg>
-                                            Booking...
+                                            Verifying & Booking...
                                         </span>
                                     </button>
                                 </div>
@@ -1045,6 +1150,11 @@
                 loadingSlots: false,
                 showServiceError: false,
                 showTimeSlotError: false,
+                // Step 3: Email Verification
+                verificationCode: '',
+                verificationSent: false,
+                sendingCode: false,
+                showVerificationError: false,
                 submitting: false,
                 minDate: new Date().toISOString().split('T')[0],
                 
@@ -1058,7 +1168,7 @@
                 },
 
                 get modalTitle() {
-                    const steps = ['Client Info & Services', 'Date & Time'];
+                    const steps = ['Client Info & Services', 'Date & Time', 'Email Verification'];
                     const stepTitle = steps[this.currentStep - 1] || 'Book Appointment';
                     return this.selectedBarberName ? `${stepTitle} - ${this.selectedBarberName}` : stepTitle;
                 },
@@ -1108,17 +1218,28 @@
                     this.availableSlots = [];
                     this.showServiceError = false;
                     this.showTimeSlotError = false;
+                    // Step 3: Email Verification
+                    this.verificationCode = '';
+                    this.verificationSent = false;
+                    this.sendingCode = false;
+                    this.showVerificationError = false;
                     this.submitting = false;
                 },
 
                 submitBooking() {
-                    // Validate final step
-                    if (!this.appointmentDate || !this.selectedTimeSlot) {
-                        this.showTimeSlotError = true;
+                    // Validate final step - including verification code
+                    if (!this.appointmentDate || !this.selectedTimeSlot || !this.verificationCode || this.verificationCode.length !== 4) {
+                        if (!this.appointmentDate || !this.selectedTimeSlot) {
+                            this.showTimeSlotError = true;
+                        }
+                        if (!this.verificationCode || this.verificationCode.length !== 4) {
+                            this.showVerificationError = true;
+                        }
                         return;
                     }
                     
                     this.showTimeSlotError = false;
+                    this.showVerificationError = false;
                     this.submitting = true;
 
                     // Create and submit form programmatically
@@ -1133,7 +1254,7 @@
                     csrfInput.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
                     form.appendChild(csrfInput);
 
-                    // Add form data
+                    // Add form data - INCLUDING verification_code
                     const formData = {
                         barber_id: this.selectedBarberId,
                         customer_name: this.customerName,
@@ -1141,8 +1262,11 @@
                         customer_email: this.customerEmail,
                         appointment_date: this.appointmentDate,
                         appointment_time: this.selectedTimeSlot,
+                        verification_code: this.verificationCode,
                         services: this.selectedServices
                     };
+
+                    console.log('Submitting form data:', formData); // Debug log
 
                     Object.entries(formData).forEach(([key, value]) => {
                         if (key === 'services') {
@@ -1190,6 +1314,21 @@
                     this.currentStep = 1;
                 },
 
+                goToStep3() {
+                    // Validate step 2
+                    if (!this.appointmentDate || !this.selectedTimeSlot) {
+                        this.showTimeSlotError = true;
+                        return;
+                    }
+                    
+                    this.showTimeSlotError = false;
+                    this.currentStep = 3;
+                },
+
+                goToStep2() {
+                    this.currentStep = 2;
+                },
+
                 async loadAvailableSlots() {
                     if (!this.appointmentDate) return;
                     
@@ -1221,6 +1360,77 @@
                     const ampm = hour >= 12 ? 'PM' : 'AM';
                     const displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
                     return `${displayHour}:${minutes} ${ampm}`;
+                },
+
+                async sendVerificationCode() {
+                    console.log('sendVerificationCode called');
+                    console.log('Email:', this.customerEmail);
+                    console.log('Name:', this.customerName);
+                    
+                    if (!this.customerEmail || !this.customerName) {
+                        console.log('Missing email or name');
+                        this.showTemporaryMessage('❌ Please fill in your name and email first.', 'error');
+                        return;
+                    }
+
+                    this.sendingCode = true;
+                    this.showVerificationError = false;
+
+                    try {
+                        console.log('Sending verification request...');
+                        const response = await fetch('/send-verification', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                customer_email: this.customerEmail,
+                                customer_name: this.customerName
+                            })
+                        });
+
+                        console.log('Response status:', response.status);
+                        const data = await response.json();
+                        console.log('Response data:', data);
+
+                        if (data.success) {
+                            this.verificationSent = true;
+                            this.showTemporaryMessage('✅ Verification code sent to your email!', 'success');
+                        } else {
+                            throw new Error(data.message || 'Failed to send verification code');
+                        }
+                    } catch (error) {
+                        console.error('Error sending verification code:', error);
+                        this.showTemporaryMessage('❌ Failed to send verification code. Please try again.', 'error');
+                    } finally {
+                        this.sendingCode = false;
+                    }
+                },
+
+                showTemporaryMessage(message, type = 'success') {
+                    // Create a temporary notification
+                    const notification = document.createElement('div');
+                    notification.className = `fixed top-20 right-4 z-[70] p-4 rounded-lg shadow-lg transform transition-all duration-300 ${
+                        type === 'success' ? 'bg-green-600' : 'bg-red-600'
+                    } text-white`;
+                    notification.textContent = message;
+                    
+                    document.body.appendChild(notification);
+                    
+                    // Animate in
+                    requestAnimationFrame(() => {
+                        notification.style.transform = 'translateX(0)';
+                    });
+                    
+                    // Remove after 3 seconds
+                    setTimeout(() => {
+                        notification.style.transform = 'translateX(100%)';
+                        setTimeout(() => {
+                            document.body.removeChild(notification);
+                        }, 300);
+                    }, 3000);
                 },
 
                 formatDate(dateString) {
