@@ -30,6 +30,14 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('barbers', BarbersController::class);
     Route::resource('appointments', AppointmentController::class);
     
+    // Calendar route
+    Route::get('calendar', function () {
+        return view('Admin.calendar.index');
+    })->name('calendar.index');
+    
+    // API endpoint for calendar appointments
+    Route::get('api/appointments', [AppointmentController::class, 'getCalendarAppointments'])->name('api.appointments');
+    
     Route::redirect('settings', 'settings/profile');
     Route::get('settings/profile', Profile::class)->name('settings.profile');
     Route::get('settings/password', Password::class)->name('settings.password');

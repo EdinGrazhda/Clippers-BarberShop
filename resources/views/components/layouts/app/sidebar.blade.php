@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="light">
     <head>
         @include('partials.head')
     </head>
@@ -15,9 +15,13 @@
                 <flux:navlist.group :heading="__('Platform')" class="grid">
                     <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
                 </flux:navlist.group>
-                 <flux:navlist.group :heading="__('Barbers')" class="grid">
-                    <flux:navlist.item icon="home" :href="route('barbers.index')" :current="request()->routeIs('barbers.index')" wire:navigate>{{ __('Barbers') }}</flux:navlist.item>
-                    <flux:navlist.item icon="home" :href="route('appointments.index')" :current="request()->routeIs('appointments.index')" wire:navigate>{{ __('Appointments') }}</flux:navlist.item>
+                 <flux:navlist.group :heading="__('Menagement Section')" class="grid">
+                    <flux:navlist.item icon="user" :href="route('barbers.index')" :current="request()->routeIs('barbers.index')" wire:navigate>{{ __('Barbers') }}</flux:navlist.item>
+                    <flux:navlist.item icon="calendar-days" :href="route('appointments.index')" :current="request()->routeIs('appointments.index')" wire:navigate>{{ __('Appointments') }}</flux:navlist.item>
+                </flux:navlist.group>
+
+                 <flux:navlist.group :heading="__('Calendar Section')" class="grid">
+                   <flux:navlist.item icon="calendar-days" :href="route('calendar.index')" :current="request()->routeIs('calendar.index')" wire:navigate>{{ __('Calendar View') }}</flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
 
