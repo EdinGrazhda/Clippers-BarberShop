@@ -18,6 +18,7 @@ class Appointment extends Model
         'service',
         'notes',
         'status',
+        'reminder_sent',
     ];
 
     protected $casts = [
